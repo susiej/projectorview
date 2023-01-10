@@ -97,8 +97,8 @@ class ProjectorView(tk.Frame):
     # with Windows OS
     self.bind_all("<MouseWheel>", self._on_mousewheel)
     # with Linux
-    self.bind("<Button-4>", self._on_mousewheel)
-    self.bind("<Button-5>", self._on_mousewheel)
+    self.bind_all("<Button-4>", self._on_mousewheel)
+    self.bind_all("<Button-5>", self._on_mousewheel)
 
   def _unbound_to_mousewheel(self, event):
     self.unbind_all("<MouseWheel>")
@@ -107,14 +107,21 @@ class ProjectorView(tk.Frame):
 
   def _on_mousewheel(self, event):
     if sys.platform == 'darwin':
-      delta = event.delta
+      delta = int(event.delta)
+      state = event.state
+    elif event.num == 4:
+        delta = 1
+        state = False
+    elif event.num == 5:
+        delta = -1
+        state = False
     else:
-      delta = event.delta / 120
-
-    if event.state:
-      self.canvas.xview_scroll(-1*(delta), "units")
+      delta = int(event.delta) / 120
+      state = event.state
+    if state:
+      self.canvas.xview_scroll(int(-1*(delta)), "units")
     else:
-      self.canvas.yview_scroll(-1*(delta), "units")
+      self.canvas.yview_scroll((-1*(delta)), "units")
 
   def layerModal(self):
     layers = self.doc.layer_ui_configs()
@@ -176,6 +183,6 @@ class ProjectorView(tk.Frame):
     self.imgtag=self.canvas.create_image(0,0,anchor="nw",image=self.tkimg)
 
 sp = ProjectorView()
-sp.setPDF('/Users/susie/sewing/Patterns/Patterns/Itch to Stitch/Angelia Shorts/Itch-to-Stitch-Angelia-Shorts-PDF-Sewing-Pattern-Large-Format-V3.pdf')
+sp.setPDF('./Itch-to-Stitch-Angelia-Shorts-PDF-Sewing-Pattern-Large-Format-V3.pdf')
 sp.mainloop()
 #doc = fitz.open('/Users/susie/sewing/Patterns/Patterns/Itch to Stitch/Angelia Shorts/Itch-to-Stitch-Angelia-Shorts-PDF-Sewing-Pattern-Large-Format-V3.pdf')
