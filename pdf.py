@@ -27,8 +27,11 @@ class PDF:
             matrix = Matrix(scale_factor, scale_factor)
         for page in self.doc:
             pix = page.get_pixmap(matrix=matrix)
-            fmt = QImage.Format.Format_RGBA8888 if pix.alpha else QImage.Format.Format_RGB888
-            img = QImage(pix.samples_ptr, pix.width, pix.height, fmt)
+            bs = pix.tobytes("ppm")
+            img = QImage.fromData(bs, "PPM")
+            #fmt = QImage.Format.Format_RGBA8888 if pix.alpha else QImage.Format.Format_RGB888
+            #img = QImage(pix.samples, pix.width, pix.height, fmt)
+            print(f"w {pix.width} h {pix.height}")
             imgs.append(img)
         return imgs
 
