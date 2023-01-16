@@ -12,7 +12,7 @@ class ProjectorCanvas(BaseCanvas):
         screen = self.screen()
         pdfdpi = 72 # pdf dpi
         pdfdpm = pdfdpi * 1000 / 25.4
-        projectionWidth = self.settings.value('projector/width_mm', 100) / 1000
+        projectionWidth = int(self.settings.value('projector/width_mm', 100)) / 1000
         devicedpm = screen.size().width() / projectionWidth
         self.scale_factor = devicedpm / pdfdpm 
 

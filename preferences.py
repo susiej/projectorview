@@ -25,7 +25,7 @@ class PreferencesDialog(QDialog):
         self.sp = QSpinBox()
         self.sp.setMaximum(4000)
         self.sp.setMinimum(10)
-        self.sp.setValue(self.settings.value("projector/width_mm", 100))
+        self.sp.setValue(int(self.settings.value("projector/width_mm", 100)))
 
         layout.addWidget(self.sp)
         self.sp.valueChanged.connect(self.valuechange)
