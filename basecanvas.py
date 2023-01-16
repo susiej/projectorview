@@ -33,16 +33,14 @@ class BaseCanvas(QtWidgets.QGraphicsView):
 
     def redraw(self):
         self.scene.clear()
-        pixs = self.pdf.createImages(self.scale_factor)
-        if pixs == []:
+        imgs = self.pdf.createImages(self.scale_factor)
+        if imgs == []:
             self.setDragMode(QtWidgets.QGraphicsView.DragMode.NoDrag)
             return
         self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
 
         h = 0
-        for pix in pixs:
-            fmt = QImage.Format.Format_RGBA8888 if pix.alpha else QImage.Format.Format_RGB888
-            img = QImage(pix.samples_ptr, pix.width, pix.height, fmt)
+        for img in imgs:
             if self.invert:
                 img.invertPixels()
             qp = QPixmap.fromImage(img)
