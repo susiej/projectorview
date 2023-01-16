@@ -14,8 +14,8 @@ from PyQt6.QtCore import Qt, QSize, QTimer, QSettings, QUrl
 from PyQt6.QtGui import QIcon, QAction, QKeySequence, QImage
 #from PyQt6.QtSvg import QtSVGWidgets 
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWebEngineWidgets import *
-from PyQt6.QtWebEngineCore import *
+#from PyQt6.QtWebEngineWidgets import *
+#from PyQt6.QtWebEngineCore import *
 from PyQt6.QtPdfWidgets import QPdfView
 from PyQt6 import QtPdf
 
