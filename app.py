@@ -40,7 +40,8 @@ class Application(QApplication):
         else:
             self.pdf.setPDF(None)
 
-        self.menubar = QMenuBar()
+        self.mainwindow = MainWindow(self)
+        self.menubar = self.mainwindow.menuBar()
 
         openFile = QAction('&Open...', self)
         openFile.setShortcut(QKeySequence.StandardKey.Open)
@@ -56,7 +57,6 @@ class Application(QApplication):
         fileMenu.addAction(openFile)
         fileMenu.addAction(settingsAction)
 
-        self.mainwindow = MainWindow(self)
         self.mainwindow.show()
 
         screens = self.screens()
