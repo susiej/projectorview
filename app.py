@@ -20,7 +20,8 @@ from PyQt6.QtPdfWidgets import QPdfView
 from PyQt6 import QtPdf
 
 from pdf import PDF
-from layerwidget import LayerWidget
+from mainwindow import MainWindow
+from pdfsettings import PDFSettings
 from canvas import Canvas
 #from canvas2 import Canvas2
 from projectorcanvas import ProjectorCanvas
@@ -32,16 +33,37 @@ class Application(QApplication):
         self.setOrganizationName('Susie Johnston')
         self.setOrganizationDomain('susie.id.au')
         self.setApplicationName('ProjectorView')
-        self.settings = QSettings()
         self.pdf = PDF(self)
-        self.projectorcanvas = None
         if len(args) > 1:
             self.pdf.setPDF(arg[1])
         else:
             self.pdf.setPDF(None)
 
+        self.settings = QSettings()
+        self.projectorcanvas = ProjectorCanvas(self)
+
         self.mainwindow = MainWindow(self)
-        self.menubar = self.mainwindow.menuBar()
+        self.createMenus()
+
+        self.mainwindow.show()
+
+        screens = self.screens()
+            
+        if len(screens) > 1:
+            proj = screens[1]
+            geo = proj.geometry()
+            self.projectorcanvas.setScreen(proj);
+            self.projectorcanvas.move(geo.topLeft())
+            self.projectorcanvas.showFullScreen()
+        ##### move to hidden if no projector
+        self.projectorcanvas.show()
+
+    def createMenus(self):
+        if sys.platform == 'darwin':
+            self.menubar = QMenuBar()
+        else:
+            self.menubar = self.mainwindow.menuBar()
+
 
         openFile = QAction('&Open...', self)
         openFile.setShortcut(QKeySequence.StandardKey.Open)
@@ -57,25 +79,6 @@ class Application(QApplication):
         fileMenu.addAction(openFile)
         fileMenu.addAction(settingsAction)
 
-        self.mainwindow.show()
-
-        screens = self.screens()
-
-            
-        #if len(screens) > 1:
-        if len(screens) > 0:
-            #proj = screens[1]
-            #geo = proj.geometry()
-            self.projectorcanvas = ProjectorCanvas(self)
-            #self.projectorcanvas.setScreen(proj);
-            #self.projectorcanvas.move(geo.topLeft())
-            #self.projectorcanvas.showFullScreen()
-            self.projectorcanvas.show()
-
-        
-            
-
-
     def showPreferencesDialog(self):
         dlg = PreferencesDialog(self.mainwindow)
         dlg.exec()
@@ -88,57 +91,12 @@ class Application(QApplication):
         if fname[0]:
             path = fname[0]
             self.pdf.setPDF(path)
-            self.mainwindow.layerWidget.updateDisplay()
-            self.mainwindow.canvas.setPDF(self.pdf)
-            #if self.canvas2 != None:
-            #    self.canvas2.setPDF(self.pdf)
-            if self.projectorcanvas != None:
-                self.projectorcanvas.setPDF(self.pdf)
+            #self.mainwindow.pdfSettings.updateDisplay()
+            self.mainwindow.pdfSettings.redraw()
+            self.mainwindow.canvas.redraw(True)
+            self.projectorcanvas.redraw(True)
             self.settings.setValue('files/last_location', os.path.dirname(path))
             self.settings.sync()
-
-class MainWindow(QMainWindow):
-    def __init__(self, parent):
-        super().__init__()
-        self.parent = parent
-        self.settings = self.parent.settings
-        self.readSettings()
-
-        self.setWindowTitle("ProjectorView")
-
-        layout = QHBoxLayout()
-
-        self.canvas = Canvas(self)
-        self.layerWidget = LayerWidget(self)
-        self.layerWidget.setPDF(self.parent.pdf)
-
-
-        layout.addWidget(self.layerWidget)
-        layout.addWidget(self.canvas)
-        widget = QWidget()
-        widget.setLayout(layout)
-
-        self.setCentralWidget(widget)
-        self.setMinimumSize(QSize(400, 300))
-
-
-    def readSettings(self):
-        self.settings.beginGroup("Main Window")
-        geometry = self.settings.value("geometry")
-        if geometry == None:
-            self.setGeometry(200, 200, 400, 400);
-        else:
-            self.restoreGeometry(geometry)
-        self.settings.endGroup()
-
-    def writeSettings(self):
-        self.settings.beginGroup("Main Window")
-        self.settings.setValue("geometry", self.saveGeometry());
-        self.settings.endGroup();
-
-    def closeEvent(self, event):
-        self.writeSettings()
-        super().closeEvent(event)
 
 
 if __name__ == '__main__':

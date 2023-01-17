@@ -5,8 +5,9 @@ from PyQt6.QtCore import Qt
 
 from basecanvas import BaseCanvas
 class ProjectorCanvas(BaseCanvas):
-    def __init__(self, parent):
-        super().__init__(parent, fixedZoom = True)
+    def __init__(self, app):
+        super().__init__(app, app, isProjected = True)
+        self.app = app
 
     def calculateScale(self):
         screen = self.screen()
@@ -17,7 +18,7 @@ class ProjectorCanvas(BaseCanvas):
         self.scale_factor = devicedpm / pdfdpm 
 
 
-    def redraw(self):
+    def redraw(self, resize = False):
         self.calculateScale()
-        super().redraw()
+        super().redraw(resize)
 

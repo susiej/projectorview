@@ -9,7 +9,7 @@ from basecanvas import BaseCanvas
 
 class Canvas(BaseCanvas):
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, parent.app)
 
 
 
