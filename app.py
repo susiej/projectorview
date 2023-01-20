@@ -34,10 +34,6 @@ class Application(QApplication):
         self.setOrganizationDomain('susie.id.au')
         self.setApplicationName('ProjectorView')
         self.pdf = PDF(self)
-        if len(args) > 1:
-            self.pdf.setPDF(arg[1])
-        else:
-            self.pdf.setPDF(None)
 
         self.settings = QSettings()
         self.projectorcanvas = ProjectorCanvas(self)
@@ -57,6 +53,20 @@ class Application(QApplication):
             self.projectorcanvas.showFullScreen()
         ##### move to hidden if no projector
         self.projectorcanvas.show()
+
+        hasFile = False
+        if len(args) > 1:
+            path = args[1]
+            if os.path.exists(args[1]) and Path(path).is_file():
+                if Path(path).suffix == '.pdf':
+                    self.setPDF(path)
+                    hasFile = True
+                else:
+                    print("Not a pdf file")
+            else:
+                print("File does not exist")
+        if not hasFile:
+            self.setPDF(None)
 
     def createMenus(self):
         if sys.platform == 'darwin':
@@ -83,6 +93,16 @@ class Application(QApplication):
         dlg = PreferencesDialog(self.mainwindow)
         dlg.exec()
 
+    def setPDF(self, path):
+        self.pdf.setPDF(path)
+        #self.mainwindow.pdfSettings.updateDisplay()
+        if path:
+            self.mainwindow.pdfSettings.redraw()
+            self.mainwindow.canvas.redraw(True)
+            self.projectorcanvas.redraw(True)
+            self.settings.setValue('files/last_location', os.path.dirname(path))
+        self.settings.sync()
+
     def showFileDialog(self):
         path = self.settings.value('files/last_location', str(Path.home()))
         if not os.path.exists(path):
@@ -90,13 +110,7 @@ class Application(QApplication):
         fname = QFileDialog.getOpenFileName(self.mainwindow, 'Open file', path, 'PDF Files (*.pdf)')
         if fname[0]:
             path = fname[0]
-            self.pdf.setPDF(path)
-            #self.mainwindow.pdfSettings.updateDisplay()
-            self.mainwindow.pdfSettings.redraw()
-            self.mainwindow.canvas.redraw(True)
-            self.projectorcanvas.redraw(True)
-            self.settings.setValue('files/last_location', os.path.dirname(path))
-            self.settings.sync()
+            self.setPDF(path)
 
 
 if __name__ == '__main__':

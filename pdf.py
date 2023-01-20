@@ -28,7 +28,7 @@ class PDF:
         matrix = Matrix(fitz.Identity)
         if scale_factor:
             matrix = Matrix(scale_factor, scale_factor)
-        for page in self.doc:
+        for i, page in enumerate(self.doc):
             pix = page.get_pixmap(matrix=matrix)
             bs = pix.tobytes("ppm")
             img = QImage.fromData(bs, "PPM")

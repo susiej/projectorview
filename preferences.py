@@ -7,7 +7,7 @@ import functools
 from pathlib import Path
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QFileDialog, QMenuBar, QDialog, QSpinBox, QLabel
+from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, QSize, QSettings
 from PyQt6.QtGui import QIcon, QAction
 

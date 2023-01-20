@@ -20,7 +20,6 @@ class LayersWidget(QGroupBox):
         if self.pdf.doc == None:
             return
         
-        draw()
 
     def redraw(self):
         self.clearLayout()
