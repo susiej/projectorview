@@ -3,6 +3,7 @@
 import os
 import sys
 import fitz
+import base64
 import functools
 from pathlib import Path
 
@@ -34,6 +35,7 @@ class Application(QApplication):
         self.setOrganizationDomain('susie.id.au')
         self.setApplicationName('ProjectorView')
         self.pdf = PDF(self)
+        self.p_key = None
 
         self.settings = QSettings()
         self.projectorcanvas = ProjectorCanvas(self)
@@ -44,15 +46,10 @@ class Application(QApplication):
         self.mainwindow.show()
 
         screens = self.screens()
-            
-        if len(screens) > 1:
-            proj = screens[1]
-            geo = proj.geometry()
-            self.projectorcanvas.setScreen(proj);
-            self.projectorcanvas.move(geo.topLeft())
-            self.projectorcanvas.showFullScreen()
-        ##### move to hidden if no projector
-        self.projectorcanvas.show()
+        self.screenAdded.connect(self.sAdded)
+        self.screenRemoved.connect(self.sRemoved)
+        #if len(screens) > 1:
+        #    self.projectorcanvas.moveToScreen(1)
 
         hasFile = False
         if len(args) > 1:
@@ -67,6 +64,15 @@ class Application(QApplication):
                 print("File does not exist")
         if not hasFile:
             self.setPDF(None)
+
+    def sAdded(self, screen):
+        self.mainwindow.pdfSettings.projectorPDFSettings.redraw()
+
+    def sRemoved(self, screen):
+        if self.projectorcanvas.screen() == screen:
+            self.projectorcanvas.close()
+        self.mainwindow.pdfSettings.projectorPDFSettings.redraw()
+
 
     def createMenus(self):
         if sys.platform == 'darwin':
@@ -94,6 +100,7 @@ class Application(QApplication):
         dlg.exec()
 
     def setPDF(self, path):
+        self.p_key = base64.urlsafe_b64encode(path.encode()).decode() if path is not None else None
         self.pdf.setPDF(path)
         #self.mainwindow.pdfSettings.updateDisplay()
         if path:
@@ -101,6 +108,9 @@ class Application(QApplication):
             self.mainwindow.canvas.redraw(True)
             self.projectorcanvas.redraw(True)
             self.settings.setValue('files/last_location', os.path.dirname(path))
+            self.mainwindow.setWindowTitle("ProjectorView - " + Path(path).name)
+        else:
+            self.p_key = None
         self.settings.sync()
 
     def showFileDialog(self):
@@ -114,6 +124,7 @@ class Application(QApplication):
 
 
 if __name__ == '__main__':
+    os.environ['QT_IMAGEIO_MAXALLOC'] = "1000"
     app = Application(sys.argv)
     timer = QTimer()
     timer.start(500)  # You may change this if you wish.

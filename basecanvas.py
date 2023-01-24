@@ -28,9 +28,17 @@ class BaseCanvas(QtWidgets.QGraphicsView):
         self.min_line_width = 0
         self.imgs = []
         self.columns = 1
+        self.rows = 1
+        self.custom_layout = []
         self.start_page = 1
         self.end_page = None
+        self.mirrored = False
         self.rotation = 0
+        self.layout_type = "Columns"
+
+    def setLayoutType(self, t):
+        self.layout_type = t
+        self.layoutImages(True)
 
     def setStartPage(self, s):
         self.start_page = s
@@ -40,6 +48,10 @@ class BaseCanvas(QtWidgets.QGraphicsView):
         self.end_page = e
         self.layoutImages(True)
 
+    def setRows(self, r):
+        self.rows = r
+        self.layoutImages(True)
+
     def setColumns(self, c):
         self.columns = c
         self.layoutImages(True)
@@ -47,6 +59,10 @@ class BaseCanvas(QtWidgets.QGraphicsView):
     def setInvertState(self, s):
         self.invert = s == Qt.CheckState.Checked.value
         self.redraw()
+
+    def setMirroredState(self, s):
+        self.mirrored = s == Qt.CheckState.Checked.value
+        self.scale(-1, 1)
 
     def setRotation(self, r):
         self.rotation = r
@@ -62,6 +78,36 @@ class BaseCanvas(QtWidgets.QGraphicsView):
         self.imgs = self.pdf.createImages(self.scale_factor, self.min_line_width)
         self.layoutImages(resize)
 
+    def createColumnLayout(self):
+        start = self.start_page - 1
+        end = self.end_page - 1 if self.end_page is not None else self.pdf.doc.page_count 
+
+        custom_layout = [[]]
+        j = 0
+        for p in range(start, end + 1):
+            if len(custom_layout[j]) == self.columns:
+                custom_layout.append([])
+                j += 1
+            custom_layout[j].append(p)
+        return custom_layout
+
+    def createRowLayout(self):
+        start = self.start_page - 1
+        end = self.end_page - 1 if self.end_page is not None else self.pdf.doc.page_count + 1
+
+        custom_layout = []
+        j = 0
+        for r in range(self.rows):
+            custom_layout.append([])
+        r = 0
+        for p in range(start, end + 1):
+            if r == self.rows:
+                r = 0
+            custom_layout[r].append(p)
+            r += 1
+        return custom_layout
+                
+
     def layoutImages(self, resize = False):
         self.scene.clear()
         if self.imgs == []:
@@ -69,44 +115,37 @@ class BaseCanvas(QtWidgets.QGraphicsView):
             return
 
         self.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
+        match self.layout_type:
+            case "Columns":
+                current_layout = self.createColumnLayout()
+            case "Rows":
+                current_layout = self.createRowLayout()
+            case "Custom":
+                current_layout = self.custom_layout
 
         maxW = 0
         maxH = 0
-        start = self.start_page
-        end = self.end_page if self.end_page is not None else self.pdf.doc.page_count
+        for r, col in enumerate(current_layout):
+            for c, v in enumerate(col):
+                if v != -1 and v < len(self.imgs):
+                    img = self.imgs[v]
+                    maxW = max(maxW, img.width())
+                    maxH = max(maxH, img.height())
 
-        for i, img in enumerate(self.imgs):
-            if i >= (start - 1) and i <= (end - 1):
-                maxW = max(maxW, img.width())
-                maxH = max(maxH, img.height())
-
-        h = 0
-        w = 0
-        c = 1
-        for i, img in enumerate(self.imgs):
-            if i < (start - 1) or i > (end - 1):
-                continue
-            if self.invert:
-                img.invertPixels()
-            qp = QPixmap.fromImage(img)
-            gi = QGraphicsPixmapItem(qp) 
-            self.scene.addItem(gi)
-            newcol = False
-            if c >= self.columns:
-                c = 1
-                newcol = True
-            else:
-                c += 1
-                
-            gi.setPos(w, h)
-            if newcol:
-                h = h + maxH
-                w = 0
-            else:
-                w = w + maxW
+        for r, col in enumerate(current_layout):
+            for c, v in enumerate(col):
+                if v != -1 and v < len(self.imgs):
+                    img = self.imgs[v]
+                    if self.invert:
+                        img.invertPixels()
+                    qp = QPixmap.fromImage(img)
+                    gi = QGraphicsPixmapItem(qp) 
+                    gi.setPos(c * maxW, r * maxH)
+                    self.scene.addItem(gi)
         
         if resize:
             self.resize()
+
 
     def resize(self):
         self.scene.setSceneRect(self.scene.itemsBoundingRect())

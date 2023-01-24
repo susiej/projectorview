@@ -28,8 +28,13 @@ class MainWindow(QMainWindow):
         self.canvas = Canvas(self)
         self.pdfSettings = PDFSettings(self, app)
 
-        layout.addWidget(self.pdfSettings)
-        layout.addWidget(self.canvas)
+        scroll = QScrollArea()
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.pdfSettings)
+        layout.addWidget(scroll, 1)
+        layout.addWidget(self.canvas, 3)
         widget = QWidget()
         widget.setLayout(layout)
 

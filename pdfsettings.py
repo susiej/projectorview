@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import *
 from layerswidget import LayersWidget
 from projectorpdfsettings import ProjectorPDFSettings
 from pdflayout import PDFLayout
+from pdftrim import TrimSettings
 
 class PDFSettings(QWidget):
     def __init__(self, parent, app):
@@ -20,13 +21,16 @@ class PDFSettings(QWidget):
     def redraw(self):
         self.layerswidget.redraw()
         self.pdfLayout.redraw()
+        self.trimSettings.redraw()
 
     def draw(self):
         self.layerswidget = LayersWidget(self, self.app)
+        self.trimSettings = TrimSettings(self, self.app)
         self.projectorPDFSettings = ProjectorPDFSettings(self, self.app)
         self.pdfLayout = PDFLayout(self, self.app)
         self.layout.addWidget(self.layerswidget)
         self.layout.addWidget(self.pdfLayout)
+        self.layout.addWidget(self.trimSettings)
         self.layout.addWidget(self.projectorPDFSettings)
         self.setLayout(self.layout)
         self.layout.addStretch()
