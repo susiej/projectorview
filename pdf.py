@@ -58,7 +58,6 @@ class PDF:
             page.set_cropbox(r)
 
     def createImages(self, scale_factor = 1, min_line_width = 0):
-
         if not self.pdfPath:
             return []
         if not self.doc:

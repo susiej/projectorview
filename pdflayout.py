@@ -24,7 +24,7 @@ class PDFLayout(QGroupBox):
         sb = QSpinBox()
         sb.setMinimum(1)
         sb.setMaximum(page_count)
-        sb.setValue(self.canvas.start_page)
+        sb.setValue(int(self.canvas.start_page))
         #self.canvas.setStartPage(1)
         #self.projectorcanvas.setStartPage(1)
         sb.valueChanged.connect(self.canvas.setStartPage)
@@ -37,7 +37,7 @@ class PDFLayout(QGroupBox):
         sb = QSpinBox()
         sb.setMinimum(1)
         sb.setMaximum(page_count)
-        sb.setValue(self.canvas.end_page)
+        sb.setValue(int(self.canvas.end_page))
         #self.canvas.setEndPage(page_count)
         #self.projectorcanvas.setEndPage(page_count)
         sb.valueChanged.connect(self.canvas.setEndPage)
@@ -57,7 +57,7 @@ class PDFLayout(QGroupBox):
         sb = QSpinBox()
         sb.setMaximum(15)
         sb.setMinimum(1)
-        sb.setValue(self.canvas.columns)
+        sb.setValue(int(self.canvas.columns))
         sb.valueChanged.connect(self.projectorcanvas.setColumns)
         sb.valueChanged.connect(self.canvas.setColumns)
         sb.valueChanged.connect(self.saveSettings)
@@ -93,12 +93,12 @@ class PDFLayout(QGroupBox):
         self.settings.beginGroup(key)
         for c in [self.canvas, self.projectorcanvas]:
             c.layout_type = self.settings.value( 'layout_type', c.layout_type)
-            c.start_page = self.settings.value( 'start_page', 1)
-            c.end_page = self.settings.value( 'end_page', self.pdf.doc.page_count)
+            c.start_page = int(self.settings.value( 'start_page', 1))
+            c.end_page = int(self.settings.value( 'end_page', self.pdf.doc.page_count))
             if c.end_page is None:
                 c.end_page = self.pdf.doc.page_count
-            c.rows = self.settings.value( 'rows', 1)
-            c.columns = self.settings.value( 'columns', 1)
+            c.rows = int(self.settings.value( 'rows', 1))
+            c.columns = int(self.settings.value( 'columns', 1))
             c.custom_layout = self.settings.value( 'custom_layout', [])
         self.settings.endGroup()
 
