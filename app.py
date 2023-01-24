@@ -7,7 +7,7 @@ import base64
 import functools
 from pathlib import Path
 
-from PIL import Image, ImageQt, ImageOps
+#from PIL import Image, ImageQt, ImageOps
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QHBoxLayout, QFileDialog, QMenuBar, QDialog, QLabel
