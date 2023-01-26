@@ -1,13 +1,9 @@
-import os
-import sys
 import fitz
-import functools
-from pathlib import Path
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, QSize, QSettings, QRect
-from PyQt6.QtGui import QIcon, QAction, QPixmap
+from PyQt6.QtGui import QIcon, QAction, QPixmap, QCursor
 
 
 class CustomLayoutDialog(QDialog):
@@ -36,7 +32,7 @@ class CustomLayoutDialog(QDialog):
 
         self.setLayout(self.layout)
 
-        self.imgs = self.pdf.createImages()
+        self.imgs = self.pdf.createImages(scale_factor = 0.1)
         self.custom_layout = self.canvas.custom_layout
         if len(self.custom_layout) == 0:
             self.cols = 1
@@ -155,6 +151,7 @@ class Dragger(QListWidget):
         self.setIconSize(QSize(75, 75))
         #self.setDragEnabled(True)
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.DragOnly)
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
 
 class Dropper(QLabel):
@@ -163,7 +160,8 @@ class Dropper(QLabel):
         self.parent = parent
         self.setMinimumSize(75, 75)
         self.setMaximumSize(75, 75)
-        self.setFrameStyle(QFrame.Shape.StyledPanel|QFrame.Shadow.Sunken)
+        self.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Raised)
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setLineWidth(3)
         self.setAcceptDrops(True)
         self.page_num = -1
@@ -171,10 +169,14 @@ class Dropper(QLabel):
 
     def dragEnterEvent(self, event):
         current = self.parent.list.currentItem()
+        self.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Sunken)
         if current is not None:
             event.accept()
         else:
             event.ignore()
+
+    def dragLeaveEvent(self, event):
+        self.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Raised)
 
     def mousePressEvent(self, event):
         self.page_num = -1
@@ -183,6 +185,7 @@ class Dropper(QLabel):
 
     def dropEvent(self, event):
         current = self.parent.list.currentItem()
+        self.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Raised)
         if current is not None:
             i = int(current.text()) - 1
             self.page_num = i

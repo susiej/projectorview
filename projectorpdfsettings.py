@@ -1,4 +1,3 @@
-import functools
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import *
 
@@ -29,17 +28,17 @@ class ProjectorPDFSettings(QGroupBox):
     def redraw(self):
         self.clearLayout()
         screens = self.app.screens()
-        if len(screens) == 0:
-            return
-        if len(screens) > 1:
-            self.screenbox = QComboBox()
-            self.screenbox.addItem("None", -1)
-            for i, s in enumerate(screens):
-                if s != self.screen():
-                    self.screenbox.addItem(s.name(), i)
-            self.screenbox.currentIndexChanged.connect(self.setScreen)
-            self.layout.addRow(self.screenbox)
-            
+        self.screenbox = QComboBox()
+        self.screenbox.addItem("None", -1)
+        for i, s in enumerate(screens):
+            if s != self.screen():
+                self.screenbox.addItem(s.name(), i)
+                if s == self.projectorcanvas.screen():
+                    x = self.screenbox.findData(i)
+                    self.screenbox.setCurrentIndex(x)
+        self.screenbox.currentIndexChanged.connect(self.setScreen)
+        self.layout.addRow(self.screenbox)
+
         
         c = QCheckBox("Invert Colour")
         c.setChecked(self.projectorcanvas.invert)
@@ -62,6 +61,10 @@ class ProjectorPDFSettings(QGroupBox):
         r.setValue(0)
         r.valueChanged.connect(self.projectorcanvas.setRotation)
         self.layout.addRow("Rotation clockwise", r)
+
+        b = QPushButton("Redraw")
+        self.layout.addRow(b)
+        b.clicked.connect(self.projectorcanvas.redraw)
 
         def openPrefs():
             dlg = PreferencesDialog(self.app.mainwindow)

@@ -1,8 +1,3 @@
-import os
-import sys
-import fitz
-import functools
-from pathlib import Path
 
 #from PIL import Image, ImageQt, ImageOps
 
@@ -39,14 +34,14 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
 
         self.setCentralWidget(widget)
-        self.setMinimumSize(QSize(400, 300))
+        self.setMinimumSize(QSize(500, 700))
 
 
     def readSettings(self):
         self.settings.beginGroup("Main Window")
         geometry = self.settings.value("geometry")
         if geometry == None:
-            self.setGeometry(200, 200, 400, 400);
+            self.setGeometry(200, 200, 700, 700);
         else:
             self.restoreGeometry(geometry)
         self.settings.endGroup()

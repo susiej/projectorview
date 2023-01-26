@@ -2,29 +2,21 @@
 # :vim:ts=4:tw=4:et:sts=4:
 import os
 import sys
-import fitz
 import base64
-import functools
+import hashlib
 from pathlib import Path
 
-#from PIL import Image, ImageQt, ImageOps
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QHBoxLayout, QFileDialog, QMenuBar, QDialog, QLabel
 from PyQt6.QtCore import Qt, QSize, QTimer, QSettings, QUrl
 from PyQt6.QtGui import QIcon, QAction, QKeySequence, QImage
-#from PyQt6.QtSvg import QtSVGWidgets 
-from PyQt6.QtSvgWidgets import QSvgWidget
-#from PyQt6.QtWebEngineWidgets import *
-#from PyQt6.QtWebEngineCore import *
-from PyQt6.QtPdfWidgets import QPdfView
 from PyQt6 import QtPdf
 
 from pdf import PDF
 from mainwindow import MainWindow
 from pdfsettings import PDFSettings
 from canvas import Canvas
-#from canvas2 import Canvas2
 from projectorcanvas import ProjectorCanvas
 from preferences import PreferencesDialog
 
@@ -100,10 +92,12 @@ class Application(QApplication):
         dlg.exec()
 
     def setPDF(self, path):
-        self.p_key = base64.urlsafe_b64encode(path.encode()).decode() if path is not None else None
+        #self.p_key = base64.urlsafe_b64encode(path.encode()).decode() if path is not None else None
         self.pdf.setPDF(path)
+        self.p_key = None
         #self.mainwindow.pdfSettings.updateDisplay()
         if path:
+            self.p_key = hashlib.file_digest(open(path, "rb"), "sha256").hexdigest()
             self.mainwindow.pdfSettings.redraw()
             self.mainwindow.canvas.redraw(True)
             self.projectorcanvas.redraw(True)
@@ -126,9 +120,9 @@ class Application(QApplication):
 if __name__ == '__main__':
     os.environ['QT_IMAGEIO_MAXALLOC'] = "1000"
     app = Application(sys.argv)
-    timer = QTimer()
-    timer.start(500)  # You may change this if you wish.
-    timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
+    #timer = QTimer()
+    #timer.start(500)  # You may change this if you wish.
+    #timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
 
     sys.exit(app.exec())
     #app.exec()

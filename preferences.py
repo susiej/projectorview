@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # :vim:ts=4:tw=4:et:sts=4:
-import os
-import sys
-import fitz
-import functools
-from pathlib import Path
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import *
@@ -19,7 +14,7 @@ class PreferencesDialog(QDialog):
         layout = QHBoxLayout()
         self.parent = parent
         self.settings = self.parent.settings
-        self.l1 = QLabel("Width lit up area (mm): ")
+        self.l1 = QLabel("Set projector as an extended display, then measure width of lit up area in mm: ")
         #self.l1.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.l1)
         self.sp = QSpinBox()
