@@ -55,12 +55,14 @@ class ProjectorPDFSettings(QGroupBox):
         lwsb.valueChanged.connect(self.projectorcanvas.setMinLineWidth)
         self.layout.addRow("Min line width (px)", lwsb)
 
-        r = QSpinBox()
-        r.setMinimum(0)
-        r.setMaximum(359)
-        r.setValue(0)
-        r.valueChanged.connect(self.projectorcanvas.setRotation)
-        self.layout.addRow("Rotation clockwise", r)
+        def changeRotation():
+            v = self.r.currentData()
+            self.projectorcanvas.setRotation(v)
+        self.r = QComboBox()
+        for i in range(0, 360, 90):
+            self.r.addItem(str(i), i)
+        self.r.currentIndexChanged.connect(changeRotation)
+        self.layout.addRow("Rotation clockwise", self.r)
 
         b = QPushButton("Redraw")
         self.layout.addRow(b)
