@@ -8,12 +8,13 @@ from PyQt6.QtGui import QIcon, QAction
 
 
 class PreferencesDialog(QDialog):
-    def __init__(self, parent):
+    def __init__(self, parent, app):
         super().__init__(parent)
         self.setWindowTitle('Preferences')
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.parent = parent
+        self.app = app
         self.settings = self.parent.settings
         self.redraw()
 
@@ -76,6 +77,10 @@ class PreferencesDialog(QDialog):
         self.settings.setValue('projector/units', self.units.currentText())
         self.settings.sync()
         self.redraw()
+
+    def accept(self):
+        self.app.projectorcanvas.redraw()
+        super().accept()
 
 
     def clearLayout(self):
