@@ -8,14 +8,13 @@ from PyQt6.QtGui import QIcon, QAction
 
 
 class PreferencesDialog(QDialog):
-    def __init__(self, parent, app):
-        super().__init__(parent)
+    def __init__(self, app):
+        super().__init__(app.mainwindow)
         self.setWindowTitle('Preferences')
         self.layout = QGridLayout()
         self.setLayout(self.layout)
-        self.parent = parent
         self.app = app
-        self.settings = self.parent.settings
+        self.settings = self.app.settings
         self.redraw()
 
     def redraw(self):
