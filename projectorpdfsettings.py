@@ -69,7 +69,7 @@ class ProjectorPDFSettings(QGroupBox):
         b.clicked.connect(self.projectorcanvas.redraw)
 
         def openPrefs():
-            dlg = PreferencesDialog(self.app.mainwindow)
+            dlg = PreferencesDialog(self.app)
             dlg.exec()
 
         cal = QPushButton('Calibrate')
