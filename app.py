@@ -88,7 +88,7 @@ class Application(QApplication):
         fileMenu.addAction(settingsAction)
 
     def showPreferencesDialog(self):
-        dlg = PreferencesDialog(self.mainwindow)
+        dlg = PreferencesDialog(self)
         dlg.exec()
 
     def setPDF(self, path):
